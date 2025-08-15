@@ -20,4 +20,34 @@ final dummyMachines = [
     modelName: 'KL50',
     totalHours: 1700,
   ),
+  Machine.createTractor(
+    id: 'TRACTOR-004',
+    name: 'No4',
+    modelName: 'SL500',
+    totalHours: 1850,
+  ),
+  Machine.createTractor(
+    id: 'TRACTOR-005',
+    name: 'No5',
+    modelName: 'SL500',
+    totalHours: 1850,
+  ),
+  Machine.createTractor(
+    id: 'TRACTOR-006',
+    name: 'No6',
+    modelName: 'SL550',
+    totalHours: 1850,
+  ),
+  Machine.createTractor(
+    id: 'TRACTOR-007',
+    name: 'No7',
+    modelName: 'MR700',
+    totalHours: 1850,
+  ),
+  Machine.createTractor(
+    id: 'TRACTOR-008',
+    name: 'No8',
+    modelName: 'SL600',
+    totalHours: 1850,
+  ),
 ];
