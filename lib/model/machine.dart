@@ -17,10 +17,6 @@ class Machine {
   final double totalHours; // アワーメーターの値
   final List<MaintenanceItem> components; // メンテナンス項目のリスト
 
-  EquipmentStatus overallStatus(MaintenanceRules rurles) {
-    return overallStatus(rules);
-  }
-
   factory Machine.createTractor({
     required String id,
     required String name,
