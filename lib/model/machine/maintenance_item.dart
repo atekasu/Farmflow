@@ -1,32 +1,8 @@
-enum ComponentType {
-  engineOil,
-  coolant,
-  grease,
-  airFilter,
-  hydraulicOil,
-  fuelFilter,
-  transmissionOil,
-  tirePressure,
-  brakeWire,
-}
+import 'package:farmflow/model/machine/equipment_status.dart';
+import 'package:farmflow/model/machine/equipment.dart';
 
-enum ComponentMode { intervalBased, inspectionOnly }
-
-enum EquipmentStatus { good, warning, critical }
-
-class MaintenanceRules {
-  const MaintenanceRules({
-    this.yellowThreshold = 0.2,
-    this.inspectionMaxDaysWarning = 30,
-    this.inspectionMaxDaysCritical = 60,
-  });
-  final double yellowThreshold; // 残りの割合がこの値以下の場合はyellow
-  final int inspectionMaxDaysWarning; // 検査が必要な最大日数
-  final int inspectionMaxDaysCritical; // 検査が必要な最大日数
-}
-
-class MaintenanceComponent {
-  const MaintenanceComponent({
+class MaintenanceItem {
+  const MaintenanceItem({
     required this.id,
     required this.type,
     required this.name,
@@ -40,7 +16,7 @@ class MaintenanceComponent {
   final String id; // UUID
   final ComponentType type; // コンポーネントの種類
   final String name; // コンポーネントの名前
-  final ComponentMode mode; // コンポーネントのモード（定期的
+  final ComponentMode mode; // コンポーネントのモード（定期）
 
   final double? recommendedIntervalHours;
   final double? lastMaintenanceAtHour; // 最後のメンテナンス時間
@@ -49,8 +25,9 @@ class MaintenanceComponent {
 
   EquipmentStatus evaluateStatus(double currentHours, MaintenanceRules rules) {
     if (mode == ComponentMode.intervalBased) {
-      if (recommendedIntervalHours == null || lastMaintenanceAtHour == null)
+      if (recommendedIntervalHours == null || lastMaintenanceAtHour == null) {
         return EquipmentStatus.warning;
+      }
       final used = currentHours - (lastMaintenanceAtHour ?? 0);
       final remain = 1 - (used / recommendedIntervalHours!);
       if (remain <= 0) return EquipmentStatus.critical;
@@ -59,9 +36,12 @@ class MaintenanceComponent {
     } else {
       if (lastInspectionDate == null) return EquipmentStatus.warning;
       final days = DateTime.now().difference(lastInspectionDate!).inDays;
-      if (days > rules.inspectionMaxDaysCritical)
+      if (days > rules.inspectionMaxDaysCritical) {
         return EquipmentStatus.critical;
-      if (days > rules.inspectionMaxDaysWarning) return EquipmentStatus.warning;
+      }
+      if (days > rules.inspectionMaxDaysWarning) {
+        return EquipmentStatus.warning;
+      }
       return EquipmentStatus.good;
     }
   }
