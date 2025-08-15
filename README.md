@@ -1,16 +1,25 @@
-# farmflow
+# Data Model (FarmFlow)
 
-A new Flutter project.
+## Machine
+- id: String (UUID)
+- modelName: String
+- maintenanceItems: List<MaintenanceItem>
 
-## Getting Started
+## MaintenanceItem
+- id: String (UUID)
+- name: String
+- recommendedHours: int （推奨交換時間）
+- lastReplacedHours: int （前回交換時走行時間）
+- currentHours: int （現在の走行時間）
+- status: enum(good|warning|critical)
 
-This project is a starting point for a Flutter application.
+## Status 判定ルール（概要）
+- usedHours = currentHours - lastReplacedHours
+- ratio = usedHours / recommendedHours
+- ratio < 0.7 → good
+- 0.7 ≤ ratio < 1.0 → warning
+- ratio ≥ 1.0 → critical
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## その他
+- Firebase Firestore に保存予定
+- ドキュメント構造は `machines/{machineId}/maintenanceItems/{itemId}`

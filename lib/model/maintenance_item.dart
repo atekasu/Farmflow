@@ -1,78 +1,68 @@
-import 'package:uuid/uuid.dart';
-
-/// 全体状態で使う色区分
-enum EquipmentStatus { good, warning, critical }
-
-/// しきい値（割合ベース）。
-/// - yellowThreshold: この割合以下で Warning（例: 0.2 = 残り20%）
-/// - redThreshold   : この割合以下で Critical にしたい場合に設定（デフォは 0.0 = 期限切れのみ赤）
-class MaintenanceRules {
-  final double yellowThreshold;
-  final double redThreshold;
-  const MaintenanceRules({this.yellowThreshold = 0.2, this.redThreshold = 0.0});
+enum ComponentType {
+  engineOil,
+  coolant,
+  grease,
+  airFilter,
+  hydraulicOil,
+  fuelFilter,
+  transmissionOil,
+  tirePressure,
+  brakeWire,
 }
 
-class MaintenanceItem {
-  // UUID 生成器（const コンストラクタではないので runtime 生成OK）
-  static final Uuid _uuid = const Uuid();
+enum ComponentMode { intervalBased, inspectionOnly }
 
-  MaintenanceItem({
-    String? id, // 未指定なら自動生成
+enum EquipmentStatus { good, warning, critical }
+
+class MaintenanceRules {
+  const MaintenanceRules({
+    this.yellowThreshold = 0.2,
+    this.inspectionMaxDaysWarning = 30,
+    this.inspectionMaxDaysCritical = 60,
+  });
+  final double yellowThreshold; // 残りの割合がこの値以下の場合はyellow
+  final int inspectionMaxDaysWarning; // 検査が必要な最大日数
+  final int inspectionMaxDaysCritical; // 検査が必要な最大日数
+}
+
+class MaintenanceComponent {
+  const MaintenanceComponent({
+    required this.id,
+    required this.type,
     required this.name,
-    required this.recommendedIntervalHours, // 推奨交換間隔[h]
-    this.lastMaintenanceAtHour = 0.0,       // 最終交換時のアワーメータ[h]
-    this.notes = '',
-  }) : id = id ?? _uuid.v4();
+    required this.mode,
+    this.recommendedIntervalHours,
+    this.lastMaintenanceAtHour,
+    this.lastInspectionDate,
+    this.note,
+  });
 
-  final String id;               // UUID
-  final String name;             // 例: エンジンオイル
-  final double recommendedIntervalHours; // 例: 200.0
-  final double lastMaintenanceAtHour;    // 例: 120.5
-  final String notes;
+  final String id; // UUID
+  final ComponentType type; // コンポーネントの種類
+  final String name; // コンポーネントの名前
+  final ComponentMode mode; // コンポーネントのモード（定期的
 
-  /// 現在アワーから見た残り時間[h]
-  double remainingHours(double currentHour) {
-    final nextAt = lastMaintenanceAtHour + recommendedIntervalHours;
-    return nextAt - currentHour;
-  }
+  final double? recommendedIntervalHours;
+  final double? lastMaintenanceAtHour; // 最後のメンテナンス時間
+  final DateTime? lastInspectionDate; // 最後の検査日
+  final String? note; // メモ
 
-  /// 現在アワーとルールからステータスを判定
-  EquipmentStatus statusAt(
-    double currentHour, {
-    MaintenanceRules rules = const MaintenanceRules(),
-  }) {
-    if (recommendedIntervalHours <= 0) return EquipmentStatus.good; // ガード
-
-    final rem = remainingHours(currentHour);
-
-    // 期限切れは即赤
-    if (rem <= 0) return EquipmentStatus.critical;
-
-    final ratio = rem / recommendedIntervalHours; // 残り割合(0.0~1.0)
-
-    // 割合ベースでも赤を使いたい場合
-    if (rules.redThreshold > 0 && ratio <= rules.redThreshold) {
-      return EquipmentStatus.critical;
+  EquipmentStatus evaluateStatus(double currentHours, MaintenanceRules rules) {
+    if (mode == ComponentMode.intervalBased) {
+      if (recommendedIntervalHours == null || lastMaintenanceAtHour == null)
+        return EquipmentStatus.warning;
+      final used = currentHours - (lastMaintenanceAtHour ?? 0);
+      final remain = 1 - (used / recommendedIntervalHours!);
+      if (remain <= 0) return EquipmentStatus.critical;
+      if (remain <= rules.yellowThreshold) return EquipmentStatus.warning;
+      return EquipmentStatus.good;
+    } else {
+      if (lastInspectionDate == null) return EquipmentStatus.warning;
+      final days = DateTime.now().difference(lastInspectionDate!).inDays;
+      if (days > rules.inspectionMaxDaysCritical)
+        return EquipmentStatus.critical;
+      if (days > rules.inspectionMaxDaysWarning) return EquipmentStatus.warning;
+      return EquipmentStatus.good;
     }
-
-    if (ratio <= rules.yellowThreshold) return EquipmentStatus.warning;
-    return EquipmentStatus.good;
   }
-
-  // Firestore 保存を見据えたシリアライズ
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'recommendedIntervalHours': recommendedIntervalHours,
-        'lastMaintenanceAtHour': lastMaintenanceAtHour,
-        'notes': notes,
-      };
-
-  factory MaintenanceItem.fromJson(Map<String, dynamic> j) => MaintenanceItem(
-        id: j['id'] as String?,
-        name: j['name'] as String,
-        recommendedIntervalHours: (j['recommendedIntervalHours'] as num).toDouble(),
-        lastMaintenanceAtHour: (j['lastMaintenanceAtHour'] as num?)?.toDouble() ?? 0.0,
-        notes: j['notes'] as String? ?? '',
-      );
 }
