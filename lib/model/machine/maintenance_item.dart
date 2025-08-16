@@ -23,26 +23,34 @@ class MaintenanceItem {
   final DateTime? lastInspectionDate; // 最後の検査日
   final String? note; // メモ
 
-  EquipmentStatus evaluateStatus(double currentHours, MaintenanceRules rules) {
-    if (mode == ComponentMode.intervalBased) {
-      if (recommendedIntervalHours == null || lastMaintenanceAtHour == null) {
-        return EquipmentStatus.warning;
-      }
-      final used = currentHours - (lastMaintenanceAtHour ?? 0);
-      final remain = 1 - (used / recommendedIntervalHours!);
-      if (remain <= 0) return EquipmentStatus.critical;
-      if (remain <= rules.yellowThreshold) return EquipmentStatus.warning;
-      return EquipmentStatus.good;
-    } else {
-      if (lastInspectionDate == null) return EquipmentStatus.warning;
-      final days = DateTime.now().difference(lastInspectionDate!).inDays;
-      if (days > rules.inspectionMaxDaysCritical) {
-        return EquipmentStatus.critical;
-      }
-      if (days > rules.inspectionMaxDaysWarning) {
-        return EquipmentStatus.warning;
-      }
-      return EquipmentStatus.good;
+  EquipmentStatus evaluateStatus(double currentHour, MaintenanceRules rules) {
+    switch (mode) {
+      case ComponentMode.intervalBased:
+        final total = (recommendedIntervalHours ?? 0).toDouble();
+        if (total <= 0) return EquipmentStatus.good; // 安全側
+        final used = (currentHour - (lastMaintenanceAtHour ?? 0)).toDouble();
+        final remaining = (total - used).clamp(0, total);
+        final ratio = (remaining / total).clamp(0.0, 1.0);
+
+        if (ratio < rules.criticalThreshold) {
+          return EquipmentStatus.critical; // 交換
+        } else if (ratio < rules.yellowThreshold) {
+          return EquipmentStatus.warning; // そろそろ
+        } else {
+          return EquipmentStatus.good; // 良好
+        }
+
+      case ComponentMode.inspectionOnly:
+        final last = lastInspectionDate;
+        if (last == null) return EquipmentStatus.warning; // 未点検は少なくともyellow
+        final days = DateTime.now().difference(last).inDays;
+        if (days >= rules.inspectionMaxDaysCritical) {
+          return EquipmentStatus.critical;
+        } else if (days >= rules.inspectionMaxDaysWarning) {
+          return EquipmentStatus.warning;
+        } else {
+          return EquipmentStatus.good;
+        }
     }
   }
 }
