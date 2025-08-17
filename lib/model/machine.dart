@@ -8,14 +8,14 @@ class Machine {
     required this.name,
     required this.modelName,
     required this.totalHours,
-    required this.components,
+    required this.maintenanceItems,
   });
 
   final String id; // UUIDなど
   final String name; // 機械の名前
   final String modelName; // 機械のモデル名
   final double totalHours; // アワーメーターの値
-  final List<MaintenanceItem> components; // メンテナンス項目のリスト
+  final List<MaintenanceItem> maintenanceItems; // メンテナンス項目のリスト
 
   factory Machine.createTractor({
     required String id,
@@ -28,7 +28,7 @@ class Machine {
       name: name,
       modelName: modelName,
       totalHours: totalHours,
-      components: [
+      maintenanceItems: [
         MaintenanceItem(
           id: '$id-engine-oil',
           type: ComponentType.engineOil,
@@ -59,7 +59,7 @@ class Machine {
   /// 個々のメンテ項目の状態から全体の状態を集約する
   EquipmentStatus overallStatus(MaintenanceRules rules) {
     var worst = EquipmentStatus.good;
-    for (final c in components) {
+    for (final c in maintenanceItems) {
       final s = c.evaluateStatus(totalHours, rules);
       if (s == EquipmentStatus.critical) {
         return EquipmentStatus.critical; // 1つでもcriticalなら即critical

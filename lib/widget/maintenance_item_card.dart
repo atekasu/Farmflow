@@ -2,17 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../model/machine.dart';
 
-class maintenanceItemCard extends StatelessWidget {
+class MaintenanceItemCard extends StatelessWidget {
   final Machine machine;
-  const maintenanceItemCard({Key? key, required this.machine})
-    : super(key: key);
-  @override
+  const MaintenanceItemCard({super.key, required this.machine});
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: machine.components.length,
+      itemCount: machine.maintenanceItems.length,
       itemBuilder: (context, index) {
-        final item = machine.components[index];
+        final item = machine.maintenanceItems[index];
         return Card(child: ListTile(title: Text(item.name)));
       },
     );
