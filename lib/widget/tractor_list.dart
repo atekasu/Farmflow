@@ -7,11 +7,7 @@ class TractorList extends StatelessWidget {
   final List<Machine> machines;
   final Function(Machine)? onTractorTap;
 
-  const TractorList({
-    Key? key,
-    required this.machines,
-    this.onTractorTap,
-  }) : super(key: key);
+  const TractorList({super.key, required this.machines, this.onTractorTap});
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +17,7 @@ class TractorList extends StatelessWidget {
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: TractorCard(
-            machine: machines[index],
-            onTap: onTractorTap,
-          ),
+          child: TractorCard(machine: machines[index], onTap: onTractorTap),
         );
       },
     );
@@ -35,18 +28,15 @@ class TractorCard extends StatelessWidget {
   final Machine machine;
   final Function(Machine)? onTap;
 
-  const TractorCard({
-    Key? key,
-    required this.machine,
-    this.onTap,
-  }) : super(key: key);
+  const TractorCard({Key? key, required this.machine, this.onTap})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final rules = const MaintenanceRules();
     final status = machine.overallStatus(rules);
     final statusData = _getStatusData(status);
-    
+
     return GestureDetector(
       onTap: () {
         // 画面遷移の処理はコメントアウト
@@ -126,7 +116,10 @@ class TractorCard extends StatelessWidget {
               // 下部: 走行時間
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF4A90E2),
                   borderRadius: BorderRadius.circular(8),
@@ -164,20 +157,11 @@ class TractorCard extends StatelessWidget {
   Map<String, dynamic> _getStatusData(EquipmentStatus status) {
     switch (status) {
       case EquipmentStatus.good:
-        return {
-          'color': Colors.green,
-          'text': '良好',
-        };
+        return {'color': Colors.green, 'text': '良好'};
       case EquipmentStatus.warning:
-        return {
-          'color': Colors.orange,
-          'text': '要確認',
-        };
+        return {'color': Colors.orange, 'text': '要確認'};
       case EquipmentStatus.critical:
-        return {
-          'color': Colors.red,
-          'text': '整備必要',
-        };
+        return {'color': Colors.red, 'text': '整備必要'};
     }
   }
 }
