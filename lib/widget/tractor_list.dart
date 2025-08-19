@@ -28,8 +28,7 @@ class TractorCard extends StatelessWidget {
   final Machine machine;
   final Function(Machine)? onTap;
 
-  const TractorCard({Key? key, required this.machine, this.onTap})
-    : super(key: key);
+  const TractorCard({super.key, required this.machine, this.onTap});
 
   @override
   Widget build(BuildContext context) {
