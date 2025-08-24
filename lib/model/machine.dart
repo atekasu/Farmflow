@@ -1,6 +1,6 @@
 import 'package:farmflow/model/machine/maintenance_item.dart';
 import 'package:farmflow/model/machine/equipment_status.dart';
-import 'package:farmflow/model/machine/equipment.dart';
+import 'package:farmflow/model/machine/maintenance_rules.dart';
 
 class Machine {
   Machine({
