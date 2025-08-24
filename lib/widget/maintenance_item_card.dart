@@ -1,3 +1,4 @@
+import 'package:farmflow/model/machine/equipment_status.dart';
 import 'package:flutter/material.dart';
 
 import '../model/machine.dart';
@@ -31,7 +32,18 @@ class MaintenanceItemCard extends StatelessWidget {
         children: [
           Icon(Icons.favorite, color: Colors.pink, size: 24.0),
           Padding(padding: const EdgeInsets.all(8.0)),
-          Row(children: [Text(item.name, style: TextStyle(fontSize: 16))]),
+          Column(
+            children: [
+              Text(item.name, style: TextStyle(fontSize: 16)),
+              switch (item.mode){
+                case ComponentMode intervalBaced:
+                  Text('残り時間$')
+                case ComponentMode inspectionOnly:
+                  Text('Mode: ${item.mode}'), 
+              }
+
+            ],
+          ),
         ],
       ),
     );

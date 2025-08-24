@@ -18,7 +18,7 @@ class MaintenanceItem {
   final String name; // コンポーネントの名前
   final ComponentMode mode; // コンポーネントのモード（定期）
 
-  final double? recommendedIntervalHours;
+  final double? recommendedIntervalHours; // 推奨交換間隔（時間）
   final double? lastMaintenanceAtHour; // 最後のメンテナンス時間
   final DateTime? lastInspectionDate; // 最後の検査日
   final String? note; // メモ
