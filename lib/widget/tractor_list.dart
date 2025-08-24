@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import '../model/machine.dart';
-import '../model/machine/equipment.dart';
 import '../model/machine/equipment_status.dart';
+import '../model/machine/maintenance_rules.dart';
 
 class TractorList extends StatelessWidget {
   final List<Machine> machines;
-  final Function(Machine)? onTractorTap;
+  final void Function(Machine) onSelect;
 
-  const TractorList({super.key, required this.machines, this.onTractorTap});
+  const TractorList({
+    super.key,
+    required this.machines,
+    required this.onSelect,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +19,10 @@ class TractorList extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       itemCount: machines.length,
       itemBuilder: (context, index) {
+        final m = machines[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: TractorCard(machine: machines[index], onTap: onTractorTap),
+          child: TractorCard(machine: m, onTap: () => onSelect(m)),
         );
       },
     );
@@ -26,9 +31,8 @@ class TractorList extends StatelessWidget {
 
 class TractorCard extends StatelessWidget {
   final Machine machine;
-  final Function(Machine)? onTap;
-
-  const TractorCard({super.key, required this.machine, this.onTap});
+  final VoidCallback onTap;
+  const TractorCard({super.key, required this.machine, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +41,7 @@ class TractorCard extends StatelessWidget {
     final statusData = _getStatusData(status);
 
     return GestureDetector(
-      onTap: () {
-        // 画面遷移の処理はコメントアウト
-        // if (onTap != null) {
-        //   onTap!(machine);
-        // }
-      },
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,

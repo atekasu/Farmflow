@@ -1,12 +1,13 @@
+import 'package:farmflow/screen/machine_detail_screen.dart';
 import 'package:flutter/material.dart';
 import '../model/machine.dart';
-import '../model/machine/equipment.dart';
+import '../model/machine/maintenance_rules.dart';
 import '../model/machine/equipment_status.dart';
 import '../data/tractor_dummy.dart';
 import '../widget/tractor_list.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -21,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Machine> get filteredMachines {
     if (selectedFilterIndex == 0) return dummyMachines; // 全て
-    
+
     return dummyMachines.where((machine) {
       final status = machine.overallStatus(rules);
       switch (selectedFilterIndex) {
@@ -77,9 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         height: 36,
                         decoration: BoxDecoration(
-                          color: isSelected 
-                              ? const Color(0xFF4A90E2) 
-                              : const Color(0xFFF0F0F0),
+                          color:
+                              isSelected
+                                  ? const Color(0xFF4A90E2)
+                                  : const Color(0xFFF0F0F0),
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: Center(
@@ -88,9 +90,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               color: isSelected ? Colors.white : Colors.black54,
                               fontSize: 14,
-                              fontWeight: isSelected 
-                                  ? FontWeight.w600 
-                                  : FontWeight.normal,
+                              fontWeight:
+                                  isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
                             ),
                           ),
                         ),
@@ -105,14 +108,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: TractorList(
               machines: filteredMachines,
-              onTractorTap: (machine) {
-                // 詳細画面への遷移処理はコメントアウト
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => MachineDetailScreen(machine: machine),
-                //   ),
-                // );
+              onSelect: (machine) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => MachineDetailScreen(machine: machine),
+                  ),
+                );
               },
             ),
           ),
@@ -132,22 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         elevation: 8,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'ホーム',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: '一覧',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: '設定',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'その他',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'ホーム'),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: '一覧'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: '設定'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'その他'),
         ],
       ),
     );
