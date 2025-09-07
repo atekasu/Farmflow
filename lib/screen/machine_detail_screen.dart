@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../model/machine.dart';
+import '../widget/maintenance_item_card.dart';
 
 class MachineDetailScreen extends StatefulWidget {
   final Machine machine;
@@ -27,7 +28,9 @@ class _MachineDetailScreenState extends State<MachineDetailScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: const Center(child: Text('詳細画面')),
+      body: SingleChildScrollView(
+        child: Column(children: [MaintenanceItemList(machine: widget.machine)]),
+      ),
     );
   }
 }
