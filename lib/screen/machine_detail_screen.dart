@@ -1,3 +1,6 @@
+import 'package:farmflow/model/machine/equipment_status.dart';
+import 'package:farmflow/model/machine/maintenance_rules.dart';
+import 'package:farmflow/widget/warning_section.dart';
 import 'package:flutter/material.dart';
 import '../model/machine.dart';
 import '../widget/maintenance_item_card.dart';
@@ -29,8 +32,52 @@ class _MachineDetailScreenState extends State<MachineDetailScreen> {
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        child: Column(children: [MaintenanceItemList(machine: widget.machine)]),
+        child: Column(
+          children: [
+            //警告セクション
+            WarningSection(machine: widget.machine),
+
+            //警告があれば区切り線を入れる
+            _buildDividerIfNeeded('警告'),
+
+            //メンテナンス概要セクション
+            _buildSectiontHeader('メンテナンス概要'),
+            MaintenanceItemList(machine: widget.machine),
+          ],
+        ),
       ),
     );
   }
+
+  Widget _buildDividerIfNeeded(String title) {
+    //警告項目チェック
+    final hasWarnings = widget.machine.maintenanceItems.any((item) {
+      final status = item.evaluateStatus(
+        widget.machine.totalHours,
+        const MaintenanceRules(),
+      );
+      return status != EquipmentStatus.good;
+    });
+    return hasWarnings
+        ? const Divider(height: 1, color: Colors.grey)
+        : const SizedBox.shrink();
+  }
+}
+
+Widget _buildSectiontHeader(String title) {
+  return Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Row(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+      ],
+    ),
+  );
 }
