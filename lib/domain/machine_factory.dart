@@ -10,7 +10,7 @@ class MachineFactory {
     required String id,
     required String name,
     required String modelName,
-    required double totalHours,
+    required int totalHours,
   }) {
     return Machine(
       id: id,

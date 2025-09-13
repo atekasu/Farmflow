@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../../model/machine/equipment_status.dart';
 import '../../model/machine/maintenance_item.dart';
 
