@@ -14,7 +14,7 @@ class Machine {
   final String id; // UUIDなど
   final String name; // 機械の名前
   final String modelName; // 機械のモデル名
-  final double totalHours; // アワーメーターの値
+  final int totalHours; // アワーメーターの値
   final List<MaintenanceItem> maintenanceItems; // メンテナンス項目のリスト
 
   // Factory constructors moved to domain/MachineFactory for separation of concerns.

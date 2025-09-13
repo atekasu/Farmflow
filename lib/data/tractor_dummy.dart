@@ -1,5 +1,4 @@
 // lib/data/tractor_dummy.dart
-import 'package:farmflow/model/machine.dart';
 import 'package:farmflow/domain/machine_factory.dart';
 
 final dummyMachines = [
