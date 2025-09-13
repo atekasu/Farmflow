@@ -62,17 +62,21 @@ _WarningStyle _styleFor(BuildContext context, EquipmentStatus status) {
   switch (status) {
     case EquipmentStatus.critical:
       return _WarningStyle(
-        cs.errorContainer.withOpacity(.25),
+        cs.errorContainer.withValues(alpha: .25),
         cs.error,
         cs.error,
       );
     case EquipmentStatus.warning:
       return _WarningStyle(
-        cs.secondaryContainer.withOpacity(.25),
-        cs.secondary,
-        cs.secondary,
+        Colors.amber[100]!, //背景色
+        Colors.amber[800]!, //アイコン色
+        Colors.black, //テキスト色
       );
     default:
-      return _WarningStyle(cs.surfaceVariant, cs.outline, cs.onSurfaceVariant);
+      return _WarningStyle(
+        cs.surfaceContainer,
+        cs.outline,
+        cs.onSurfaceVariant,
+      );
   }
 }
