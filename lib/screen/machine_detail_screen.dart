@@ -1,5 +1,6 @@
 import 'package:farmflow/model/machine/equipment_status.dart';
 import 'package:farmflow/model/machine/maintenance_rules.dart';
+import 'package:farmflow/screen/pre-work_inspection.dart';
 import 'package:farmflow/widget/warning_section.dart';
 import 'package:flutter/material.dart';
 import '../model/machine.dart';
@@ -14,19 +15,52 @@ class MachineDetailScreen extends StatefulWidget {
 }
 
 class _MachineDetailScreenState extends State<MachineDetailScreen> {
+  late Machine _machine;
+
+  @override
+  void initState() {
+    super.initState();
+    _machine = widget.machine;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: Text(
-          widget.machine.name,
+          _machine.name,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: TextButton.icon(
+              onPressed: () {
+                Navigator.push<Machine>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PreWorkInspectionscreen(machine: _machine),
+                  ),
+                ).then((updated) {
+                  if (updated != null) {
+                    setState(() {
+                      _machine = updated;
+                    });
+                  }
+                });
+              },
+              label: Text(
+                '使用開始',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              icon: Icon(Icons.play_arrow, color: Colors.white, size: 28),
+            ),
+          ),
+        ],
         backgroundColor: const Color(0xFF4A90E2),
         elevation: 0,
         centerTitle: true,
@@ -35,21 +69,21 @@ class _MachineDetailScreenState extends State<MachineDetailScreen> {
         child: Column(
           children: [
             //警告セクション
-            WarningSection(machine: widget.machine),
-
+            WarningSection(machine: _machine),
+            Padding(padding: const EdgeInsets.all(16.0)),
             //警告があれば区切り線を入れる
-            _buildDividerIfNeeded('警告'),
+            _buildDividerIfNeeded(),
 
             //メンテナンス概要セクション
             _buildSectiontHeader('メンテナンス概要'),
-            MaintenanceItemList(machine: widget.machine),
+            MaintenanceItemList(machine: _machine),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDividerIfNeeded(String title) {
+  Widget _buildDividerIfNeeded() {
     //警告項目チェック
     final hasWarnings = widget.machine.maintenanceItems.any((item) {
       final status = item.evaluateStatus(
