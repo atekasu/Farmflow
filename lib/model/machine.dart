@@ -33,4 +33,20 @@ class Machine {
     }
     return worst;
   }
+
+  Machine copyWith({
+    String? id,
+    String? name,
+    String? modelName,
+    int? totalHours,
+    List<MaintenanceItem>? maintenanceItems,
+  }) {
+    return Machine(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      modelName: modelName ?? this.modelName,
+      totalHours: totalHours ?? this.totalHours,
+      maintenanceItems: maintenanceItems ?? this.maintenanceItems,
+    );
+  }
 }
