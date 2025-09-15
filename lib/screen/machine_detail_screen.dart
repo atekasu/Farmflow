@@ -22,6 +22,7 @@ class _MachineDetailScreenState extends State<MachineDetailScreen> {
     super.initState();
     _machine = widget.machine;
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +44,8 @@ class _MachineDetailScreenState extends State<MachineDetailScreen> {
                 Navigator.push<Machine>(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PreWorkInspectionscreen(machine: _machine),
+                    builder:
+                        (context) => PreWorkInspectionScreen(machine: _machine),
                   ),
                 ).then((updated) {
                   if (updated != null) {
