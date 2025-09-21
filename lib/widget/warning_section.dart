@@ -12,7 +12,6 @@ class WarningSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     final rules = const MaintenanceRules();
 
     final warningItemsWithStatus =
@@ -51,7 +50,7 @@ class WarningSection extends StatelessWidget {
             ),
             child: WarningCard(
               key: ValueKey(pair.item.id),
-              item:pair.item,
+              item: pair.item,
               status: pair.status,
               totalHours: machine.totalHours.toInt(),
             ),

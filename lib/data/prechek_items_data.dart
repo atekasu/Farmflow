@@ -1,6 +1,6 @@
 import 'package:farmflow/model/precheck_item.dart';
 
-class PrechekItemsData {
+class PreCheckItemsData {
   static const List<PreCheckItem> items = [
     //トラクター本体
     PreCheckItem(
