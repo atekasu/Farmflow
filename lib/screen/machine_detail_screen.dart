@@ -1,10 +1,12 @@
 import 'package:farmflow/model/machine/equipment_status.dart';
 import 'package:farmflow/model/machine/maintenance_rules.dart';
-import 'package:farmflow/screen/pre-work_inspection.dart';
+import 'package:farmflow/screen/pre_check_screen.dart';
 import 'package:farmflow/widget/warning_section.dart';
 import 'package:flutter/material.dart';
 import '../model/machine.dart';
 import '../widget/maintenance_item_card.dart';
+import '../model/precheckrecord.dart';
+import '../model/precheck_item.dart';
 
 class MachineDetailScreen extends StatefulWidget {
   final Machine machine;
@@ -16,7 +18,6 @@ class MachineDetailScreen extends StatefulWidget {
 
 class _MachineDetailScreenState extends State<MachineDetailScreen> {
   late Machine _machine;
-
   @override
   void initState() {
     super.initState();
@@ -37,23 +38,31 @@ class _MachineDetailScreenState extends State<MachineDetailScreen> {
           ),
         ),
         actions: [
+          if (_machine.lastPreCheck != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Chip(
+                label: Text(
+                  '要点検 ${_machine.lastPreCheck!.result.values.where((s) => s == CheckStatus.warning || s == CheckStatus.critical).length}件',
+                ),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: TextButton.icon(
-              onPressed: () {
-                Navigator.push<Machine>(
+              onPressed: () async {
+                final record = await Navigator.push<PreCheckRecord>(
                   context,
                   MaterialPageRoute(
                     builder:
                         (context) => PreWorkInspectionScreen(machine: _machine),
                   ),
-                ).then((updated) {
-                  if (updated != null) {
-                    setState(() {
-                      _machine = updated;
-                    });
-                  }
-                });
+                );
+                if (record != null) {
+                  setState(() {
+                    _machine = _machine.copyWith(lastPreCheck: record);
+                  });
+                }
               },
               label: Text(
                 '使用開始',
