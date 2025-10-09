@@ -17,13 +17,14 @@ class MachineRepositoryImpl implements MachineRepository {
   List<Machine> _machines;
 
   @override
+  // 全件取得(擬似的に遅延を入れる)
   Future<List<Machine>> fetchAllMachines() async {
-    //擬似的に遅延を入れる
     await Future.delayed(const Duration(milliseconds: 300));
     return List.of(_machines);
   }
 
   @override
+  // 更新はIDで特定して上書き
   Future<void> updateMachine(Machine machine) async {
     final index = _machines.indexWhere((m) => m.id == machine.id);
     if (index != -1) {
@@ -35,9 +36,12 @@ class MachineRepositoryImpl implements MachineRepository {
   }
 
   @override
+  // 使用前点検記録の保存と、該当MachineのlastPreCheck更新
   Future<void> savePreCheckRecord(PreCheckRecord record) async {
-    //ここでは特に何もしない
     await Future.delayed(const Duration(milliseconds: 100));
-    //TODO:　PreCheckRecordを保存するロジックを実装
+    final index = _machines.indexWhere((m) => m.id == record.machineId);
+    if (index != -1) {
+      _machines[index] = _machines[index].copyWith(lastPreCheck: record);
+    }
   }
 }
