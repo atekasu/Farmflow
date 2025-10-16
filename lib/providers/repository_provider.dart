@@ -1,4 +1,3 @@
-import 'package:farmflow/model/machine.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:farmflow/data/machine_repository.dart';
 import 'package:farmflow/data/tractor_dummy.dart';
