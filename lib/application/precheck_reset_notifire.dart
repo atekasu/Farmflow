@@ -1,7 +1,6 @@
 import 'package:farmflow/application/machine_list_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:farmflow/data/machine_repository.dart';
 import 'package:farmflow/providers/repository_provider.dart';
 
 /// PreCheck の「日跨ぎで色が残る」問題を防ぐための一括クリア機構。
