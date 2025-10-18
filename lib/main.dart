@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: const HomeScreen(),
+      home: const _Bootstrap(child: HomeScreen()),
     );
   }
 }
@@ -32,28 +32,42 @@ class _Bootstrap extends ConsumerStatefulWidget {
   ConsumerState<_Bootstrap> createState() => _BootstrapState();
 }
 
-class _BootstrapState extends ConsumerState<_Bootstrap> {
-  bool _done = false;
+class _BootstrapState extends ConsumerState<_Bootstrap> with WidgetsBindingObserver {
 
   @override
   void initState() {
     super.initState();
-    //初回のフレーム後に実行（Buildをブロックしない）
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        await ref.read(precheckResetterProvider).resetIfNewDate();
-        debugPrint('☑︎ PreCheck 日跨ぎクリア完了');
-      } catch (e) {
-        debugPrint('⚠️ PreCheck 日跨ぎクリア失敗: $e');
-      } finally {
-        if (mounted) setState(() => _done = true);
-      }
-    });
+    // ライフサイクル監視を登録
+    WidgetsBinding.instance.addObserver(this);
+    // 初回フレーム後に一度だけチェック（描画をブロックしない）
+    WidgetsBinding.instance.addPostFrameCallback((_) => _resetIfNeeded());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _resetIfNeeded();
+    }
+  }
+
+  Future<void> _resetIfNeeded() async {
+    try {
+      await ref.read(precheckResetterProvider).resetIfNewDate();
+      debugPrint('✓ PreCheck 日跨ぎクリア完了（resume/boot）');
+    } catch (e) {
+      debugPrint('⚠ PreCheck 日跨ぎクリア失敗: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // ここでローディング表示を挟みたければ挟める
+    // ここでローディングを挟みたければ挟める
     return widget.child;
   }
 }
