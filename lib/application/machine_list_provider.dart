@@ -1,4 +1,3 @@
-import 'package:farmflow/data/machine_repository.dart';
 import 'package:farmflow/model/precheckrecord.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:farmflow/model/machine.dart';
@@ -31,7 +30,10 @@ class MachineListNotifier extends AsyncNotifier<List<Machine>> {
   }
 
   ///セーブ用
-  Future<void> savePreCheckResult(String _machineId, PreCheckRecord record) async {
+  Future<void> savePreCheckResult(
+    String _machineId,
+    PreCheckRecord record,
+  ) async {
     final repo = ref.read(machineRepositoryProvider);
     await repo.savePreCheckRecord(record);
     await refresh();
