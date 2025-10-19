@@ -22,18 +22,35 @@ class MachineFactory {
   /// [preCheckStatuses]: 各項目の PreCheck 状態を指定（オプション）
   ///   例: {ComponentType.engineOil: CheckStatus.warning}
   ///
+  /// [recommendedIntervals]: intervalBased 項目ごとの推奨交換間隔。
+  ///
+  /// [lastInspectionDates]: inspectionOnly 項目の最終点検日。
+  ///
   /// 指定されなかった項目は、デフォルト値を使用：
   /// - intervalBased: lastMaintenanceAtHour = 0（未交換）
-  /// - inspectionOnly: lastInspectionDate = 30日前
   /// - latestPreCheckStatus = null
   static Machine createTractor({
     required String id,
     required String name,
     required String modelName,
     required int totalHours,
+    required Map<ComponentType, int> recommendedIntervals,
+    required Map<ComponentType, DateTime> lastInspectionDates,
     Map<ComponentType, int> lastMaintenanceHours = const {},
     Map<ComponentType, CheckStatus> preCheckStatuses = const {},
   }) {
+    int _intervalFor(ComponentType type) {
+      final value = recommendedIntervals[type];
+      if (value == null) {
+        throw ArgumentError.value(
+          type,
+          'type',
+          'recommendedIntervals is missing key for $type',
+        );
+      }
+      return value;
+    }
+
     return Machine(
       id: id,
       name: name,
@@ -48,7 +65,7 @@ class MachineFactory {
           type: ComponentType.engineOil,
           name: 'エンジンオイル',
           mode: ComponentMode.intervalBased,
-          recommendedIntervalHours: 200,
+          recommendedIntervalHours: _intervalFor(ComponentType.engineOil),
           lastMaintenanceAtHour:
               lastMaintenanceHours[ComponentType.engineOil] ?? 0,
           latestPreCheckStatus: preCheckStatuses[ComponentType.engineOil],
@@ -58,7 +75,7 @@ class MachineFactory {
           type: ComponentType.hydraulicOil,
           name: '油圧オイル',
           mode: ComponentMode.intervalBased,
-          recommendedIntervalHours: 400,
+          recommendedIntervalHours: _intervalFor(ComponentType.hydraulicOil),
           lastMaintenanceAtHour:
               lastMaintenanceHours[ComponentType.hydraulicOil] ?? 0,
           latestPreCheckStatus: preCheckStatuses[ComponentType.hydraulicOil],
@@ -68,7 +85,7 @@ class MachineFactory {
           type: ComponentType.fuelFilter,
           name: '燃料フィルタ',
           mode: ComponentMode.intervalBased,
-          recommendedIntervalHours: 400,
+          recommendedIntervalHours: _intervalFor(ComponentType.fuelFilter),
           lastMaintenanceAtHour:
               lastMaintenanceHours[ComponentType.fuelFilter] ?? 0,
           latestPreCheckStatus: preCheckStatuses[ComponentType.fuelFilter],
@@ -78,7 +95,7 @@ class MachineFactory {
           type: ComponentType.transmissionOil,
           name: 'トランスミッションオイル',
           mode: ComponentMode.intervalBased,
-          recommendedIntervalHours: 600,
+          recommendedIntervalHours: _intervalFor(ComponentType.transmissionOil),
           lastMaintenanceAtHour:
               lastMaintenanceHours[ComponentType.transmissionOil] ?? 0,
           latestPreCheckStatus: preCheckStatuses[ComponentType.transmissionOil],
@@ -92,7 +109,7 @@ class MachineFactory {
           type: ComponentType.coolant,
           name: 'クーラント',
           mode: ComponentMode.inspectionOnly,
-          lastInspectionDate: DateTime.now().subtract(const Duration(days: 30)),
+          lastInspectionDate: lastInspectionDates[ComponentType.coolant],
           latestPreCheckStatus: preCheckStatuses[ComponentType.coolant],
         ),
         MaintenanceItem(
@@ -100,7 +117,7 @@ class MachineFactory {
           type: ComponentType.grease,
           name: 'グリス',
           mode: ComponentMode.inspectionOnly,
-          lastInspectionDate: DateTime.now().subtract(const Duration(days: 10)),
+          lastInspectionDate: lastInspectionDates[ComponentType.grease],
           latestPreCheckStatus: preCheckStatuses[ComponentType.grease],
         ),
         MaintenanceItem(
@@ -108,7 +125,7 @@ class MachineFactory {
           type: ComponentType.airFilter,
           name: 'エアフィルタ',
           mode: ComponentMode.inspectionOnly,
-          lastInspectionDate: DateTime.now().subtract(const Duration(days: 25)),
+          lastInspectionDate: lastInspectionDates[ComponentType.airFilter],
           latestPreCheckStatus: preCheckStatuses[ComponentType.airFilter],
         ),
         MaintenanceItem(
@@ -116,7 +133,7 @@ class MachineFactory {
           type: ComponentType.tirePressure,
           name: 'タイヤ空気圧',
           mode: ComponentMode.inspectionOnly,
-          lastInspectionDate: DateTime.now().subtract(const Duration(days: 15)),
+          lastInspectionDate: lastInspectionDates[ComponentType.tirePressure],
           latestPreCheckStatus: preCheckStatuses[ComponentType.tirePressure],
         ),
         MaintenanceItem(
@@ -124,7 +141,7 @@ class MachineFactory {
           type: ComponentType.brakeWire,
           name: 'ブレーキワイヤー',
           mode: ComponentMode.inspectionOnly,
-          lastInspectionDate: DateTime.now().subtract(const Duration(days: 45)),
+          lastInspectionDate: lastInspectionDates[ComponentType.brakeWire],
           latestPreCheckStatus: preCheckStatuses[ComponentType.brakeWire],
         ),
       ],
