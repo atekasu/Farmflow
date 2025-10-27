@@ -228,3 +228,33 @@ class MaintenanceItem {
     );
   }
 }
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Phase 2: 交換機能の拡張
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/// MaintenanceItem の拡張メソッド
+///
+/// 既存のクラスを変更せずに、新しい機能を追加する。
+extension MaintenanceItemOps on MaintenanceItem {
+  /// intervalBased 項目を「交換済み」にリセットする
+  ///
+  /// [currentHour]: 現在のアワーメーター値
+  ///
+  /// 更新内容:
+  /// - lastMaintenanceAtHour を currentHour に更新
+  /// - latestPreCheckStatus を null に（警告を消す）
+  ///
+  /// 使用例:
+  /// ```dart
+  /// final item = MaintenanceItem(lastMaintenanceAtHour: 1700);
+  /// final updated = item.resetInterval(currentHour: 1880);
+  /// // updated.lastMaintenanceAtHour == 1880
+  /// // updated.latestPreCheckStatus == null
+  /// ```
+  MaintenanceItem resetInterval({required int currentHour}) {
+    return copyWith(
+      lastMaintenanceAtHour: currentHour,
+      clearLatestPreCheck: true, // ← 既存の copyWith 仕様を使う
+    );
+  }
+}
