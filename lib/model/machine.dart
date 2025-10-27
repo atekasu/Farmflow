@@ -55,3 +55,33 @@ class Machine {
     );
   }
 }
+
+///=============================================
+///メンテナンス項目の置換機能
+///=============================================
+///
+///Machineの拡張メソッド
+extension MachineOps on Machine {
+  ///maintenanceItemsの中から、指定されたitem を置換する
+  ///
+  ///[updated]: 更新後のMaintenanceItem
+  ///
+  ///動作:
+  ///-idが一致する項目を探す
+  ///-見つかったら置換
+  ///-見つからなかったらmachineをそのまま返す(イミュータブル)
+  ///
+  Machine replaceMaintenanceItem(MaintenanceItem updated) {
+    final index = maintenanceItems.indexWhere((item) => item.id == updated.id);
+
+    // 見つからない場合は何もしない
+    if (index < 0) return this;
+
+    //新しいリストを作成(イミュータブル)
+    final newItems = List<MaintenanceItem>.from(maintenanceItems);
+    newItems[index] = updated;
+
+    //新しいMachneを返す
+    return copyWith(maintenanceItems: newItems);
+  }
+}
