@@ -1,7 +1,50 @@
+import 'package:farmflow/data/machine_repository.dart';
 import 'package:farmflow/model/precheckrecord.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:farmflow/model/machine.dart';
 import 'package:farmflow/providers/repository_provider.dart';
+
+///Machine一覧管理するStateNotfire
+class MachineListNotfire extends StateNotifier<List<Machine>> {
+  MachineListNotfire(this._repo) : super([]) {
+    _load();
+  }
+  final MachineRepository _repo;
+
+  Future<void> _load() async {
+    state = await _repo.fetchAllMachines();
+  }
+
+  Future<void> refresh() async {
+    state = await _repo.fetchAllMachines();
+  }
+
+  ///長押しで交換した時に呼ばれる関数
+  Future<void> recordExchange({
+    required String machineId,
+    required String itemId,
+  }) async {
+    //現在の機体情報を探す
+    final machine = state.firstWhere((m) => m.id == machineId);
+    final currentHour = machine.totalHours;
+
+    // Repository に処理を依頼
+    await _repo.recordMaintenance(
+      machineId: machineId,
+      itemId: itemId,
+      currentHour: currentHour,
+    );
+    //再読み込みしてUIに反映
+    await refresh();
+  }
+}
+
+/// Providerの定義
+final machineListProvider =
+    StateNotifierProvider<MachineListNotfire, List<Machine>>((ref) {
+      final repo = ref.read(machineRepositoryProvider);
+      return MachineListNotfire(repo);
+    });
 
 ///Machine一覧の非同期状態を管理
 class MachineListNotifier extends AsyncNotifier<List<Machine>> {
@@ -41,7 +84,7 @@ class MachineListNotifier extends AsyncNotifier<List<Machine>> {
 }
 
 ///Machine一覧のProvider
-final machineListProvider =
+final machineListAsyncProvider =
     AsyncNotifierProvider<MachineListNotifier, List<Machine>>(() {
       return MachineListNotifier();
     });

@@ -27,7 +27,7 @@ class PrecheckResetter {
 
     if (last == today) return; //すでに本日クリア済み
     // 1)全機体取得
-    final machines = await ref.read(machineListProvider.future);
+    final machines = await ref.read(machineListAsyncProvider.future);
     // 2)各　MaintenanceItem を　clearLatestPreCheck =true で保存（バッチ対応が理想）
     final repo = ref.read(machineRepositoryProvider);
     for (final m in machines) {
