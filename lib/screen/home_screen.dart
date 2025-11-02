@@ -24,7 +24,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final machineListAsync = ref.watch(machineListProvider);
+    final machineListAsync = ref.watch(machineListAsyncProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text(

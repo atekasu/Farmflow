@@ -1,5 +1,3 @@
-// ↓↓↓ これを lib/data/tractor_dummy.dart に貼り付け ↓↓↓
-// lib/data/tractor_dummy.dart
 import 'package:farmflow/domain/machine_factory.dart';
 import 'package:farmflow/model/machine/equipment_status.dart';
 import 'package:farmflow/model/precheck_item.dart';

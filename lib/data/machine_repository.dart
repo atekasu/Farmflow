@@ -5,22 +5,30 @@ import 'package:farmflow/model/machine/maintenance_item.dart';
 import 'package:farmflow/model/precheck_item.dart';
 import 'package:farmflow/model/precheckrecord.dart';
 
-/// Repository boundary for machine persistence.
+/// 機械データの永続化に関するリポジトリ境界です。
 abstract class MachineRepository {
-  /// Returns all available machines.
+  /// すべての利用可能な機械を返します。
   Future<List<Machine>> fetchAllMachines();
 
-  /// Persists the provided machine (upsert by [Machine.id]).
+  /// 指定された機械データを保存します（[Machine.id] によるアップサート）。
   Future<void> updateMachine(Machine machine);
 
-  /// Saves a pre-check record and updates the corresponding machine state.
+  /// 点検記録を保存し、対応する機械の状態を更新します。
   Future<void> savePreCheckRecord(PreCheckRecord record);
+
+  /// 特定のメンテナンス項目に対する作業を記録します。
+  /// lastMaintenanceAtHour を [currentHour] に更新し、直近の点検状態をクリアします。
+  Future<void> recordMaintenance({
+    required String machineId,
+    required String itemId,
+    required int currentHour,
+  });
 }
 
-/// Simple in-memory repository backed by the dummy data set.
+/// ダミーデータを使用したシンプルなインメモリリポジトリです。
 class MachineRepositoryImpl implements MachineRepository {
   MachineRepositoryImpl({List<Machine>? initial})
-      : _machines = List<Machine>.from(initial ?? dummyMachines);
+    : _machines = List<Machine>.from(initial ?? dummyMachines);
 
   final List<Machine> _machines;
   final List<PreCheckRecord> _preCheckHistory = [];
@@ -69,6 +77,34 @@ class MachineRepositoryImpl implements MachineRepository {
     );
   }
 
+  @override
+  Future<void> recordMaintenance({
+    required String machineId,
+    required String itemId,
+    required int currentHour,
+  }) async {
+    final machineIndex = _machines.indexWhere((m) => m.id == machineId);
+    if (machineIndex == -1) {
+      throw StateError('Machine $machineId not found');
+    }
+
+    final machine = _machines[machineIndex];
+    final itemIndex = machine.maintenanceItems.indexWhere(
+      (i) => i.id == itemId,
+    );
+    if (itemIndex == -1) {
+      throw StateError('Maintenance item $itemId not found');
+    }
+
+    final updatedItems = List<MaintenanceItem>.from(machine.maintenanceItems);
+    updatedItems[itemIndex] = updatedItems[itemIndex].copyWith(
+      lastMaintenanceAtHour: currentHour,
+      clearLatestPreCheck: true,
+    );
+
+    _machines[machineIndex] = machine.copyWith(maintenanceItems: updatedItems);
+  }
+
   MaintenanceItem _applyPreCheck(
     MaintenanceItem item,
     Map<String, CheckStatus> result,
@@ -84,7 +120,7 @@ class MachineRepositoryImpl implements MachineRepository {
     return item.copyWith(latestPreCheckStatus: status);
   }
 
-  /// Exposes the saved history for debug/testing purposes.
+  /// デバッグやテスト目的で保存された履歴を公開します。
   List<PreCheckRecord> get preCheckHistory =>
       List<PreCheckRecord>.unmodifiable(_preCheckHistory);
 }

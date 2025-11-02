@@ -55,12 +55,15 @@ class MachineFactory {
           type: ComponentType.engineOil,
           name: 'エンジンオイル',
           mode: ComponentMode.intervalBased,
-          recommendedIntervalHours:
-              _recommendedInterval(ComponentType.engineOil, 200),
-          lastMaintenanceAtHour:
-              _lastMaintenanceHour(ComponentType.engineOil, 0),
-          latestPreCheckStatus:
-              _latestPreCheckStatus(ComponentType.engineOil),
+          recommendedIntervalHours: _recommendedInterval(
+            ComponentType.engineOil,
+            200,
+          ),
+          lastMaintenanceAtHour: _lastMaintenanceHour(
+            ComponentType.engineOil,
+            0,
+          ),
+          latestPreCheckStatus: _latestPreCheckStatus(ComponentType.engineOil),
         ),
         MaintenanceItem(
           id: '$id-coolant',
@@ -100,42 +103,49 @@ class MachineFactory {
           type: ComponentType.hydraulicOil,
           name: '油圧オイル',
           mode: ComponentMode.intervalBased,
-          recommendedIntervalHours:
-              _recommendedInterval(ComponentType.hydraulicOil, 400),
+          recommendedIntervalHours: _recommendedInterval(
+            ComponentType.hydraulicOil,
+            400,
+          ),
           lastMaintenanceAtHour: _lastMaintenanceHour(
             ComponentType.hydraulicOil,
             totalHours - 120,
           ),
-          latestPreCheckStatus:
-              _latestPreCheckStatus(ComponentType.hydraulicOil),
+          latestPreCheckStatus: _latestPreCheckStatus(
+            ComponentType.hydraulicOil,
+          ),
         ),
         MaintenanceItem(
           id: '$id-fuel-filter',
           type: ComponentType.fuelFilter,
           name: '燃料フィルタ',
           mode: ComponentMode.intervalBased,
-          recommendedIntervalHours:
-              _recommendedInterval(ComponentType.fuelFilter, 400),
+          recommendedIntervalHours: _recommendedInterval(
+            ComponentType.fuelFilter,
+            400,
+          ),
           lastMaintenanceAtHour: _lastMaintenanceHour(
             ComponentType.fuelFilter,
             totalHours - 120,
           ),
-          latestPreCheckStatus:
-              _latestPreCheckStatus(ComponentType.fuelFilter),
+          latestPreCheckStatus: _latestPreCheckStatus(ComponentType.fuelFilter),
         ),
         MaintenanceItem(
           id: '$id-transmission-oil',
           type: ComponentType.transmissionOil,
           name: 'トランスミッションオイル',
           mode: ComponentMode.intervalBased,
-          recommendedIntervalHours:
-              _recommendedInterval(ComponentType.transmissionOil, 600),
+          recommendedIntervalHours: _recommendedInterval(
+            ComponentType.transmissionOil,
+            600,
+          ),
           lastMaintenanceAtHour: _lastMaintenanceHour(
             ComponentType.transmissionOil,
             totalHours - 200,
           ),
-          latestPreCheckStatus:
-              _latestPreCheckStatus(ComponentType.transmissionOil),
+          latestPreCheckStatus: _latestPreCheckStatus(
+            ComponentType.transmissionOil,
+          ),
         ),
         MaintenanceItem(
           id: '$id-tire-pressure',
@@ -146,19 +156,9 @@ class MachineFactory {
             ComponentType.tirePressure,
             const Duration(days: 15),
           ),
-          latestPreCheckStatus:
-              _latestPreCheckStatus(ComponentType.tirePressure),
-        ),
-        MaintenanceItem(
-          id: '$id-brake-wire',
-          type: ComponentType.brakeWire,
-          name: 'ブレーキワイヤー',
-          mode: ComponentMode.inspectionOnly,
-          lastInspectionDate: _lastInspectionDate(
-            ComponentType.brakeWire,
-            const Duration(days: 45),
+          latestPreCheckStatus: _latestPreCheckStatus(
+            ComponentType.tirePressure,
           ),
-          latestPreCheckStatus: _latestPreCheckStatus(ComponentType.brakeWire),
         ),
       ],
     );
