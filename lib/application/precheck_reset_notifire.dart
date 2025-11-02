@@ -25,10 +25,12 @@ class PrecheckResetter {
     final today = _yyyyMMdd(_now);
     final last = prefs.getString(_kLastResetKey);
 
-    if (last == today) return; //すでに本日クリア済み
-    // 1)全機体取得
-    final machines = await ref.read(machineListAsyncProvider.future);
-    // 2)各　MaintenanceItem を　clearLatestPreCheck =true で保存（バッチ対応が理想）
+    if (last == today) return; // すでに本日クリア済み
+
+    // 1) 全機体取得（同期で最新の state を読む）
+    final machines = ref.read(machineListProvider);
+
+    // 2) 各 MaintenanceItem を clearLatestPreCheck = true で保存
     final repo = ref.read(machineRepositoryProvider);
     for (final m in machines) {
       final clearedItems =
@@ -38,6 +40,8 @@ class PrecheckResetter {
       final updatedMachine = m.copyWith(maintenanceItems: clearedItems);
       await repo.updateMachine(updatedMachine);
     }
+
+    // 3) 本日の日付を記録（同日中はもう一度クリアしない）
     await prefs.setString(_kLastResetKey, today);
   }
 

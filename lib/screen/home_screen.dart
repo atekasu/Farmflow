@@ -24,7 +24,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final machineListAsync = ref.watch(machineListAsyncProvider);
+    final machines = ref.watch(machineListProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -39,11 +40,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: machineListAsync.when(
-        data: (machines) => _buildBody(machines),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error:$err')),
-      ),
+      body: _buildBody(machines),
     );
   }
 
@@ -124,7 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onSelect: (machine) {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) => MachineDetailScreen(machine: machine),
+                  builder: (_) => MachineDetailScreen(machineId: machine.id),
                 ),
               );
             },
