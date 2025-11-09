@@ -95,14 +95,9 @@ class MachineRepositoryImpl implements MachineRepository {
     if (itemIndex == -1) {
       throw StateError('Maintenance item $itemId not found');
     }
-
-    final updatedItems = List<MaintenanceItem>.from(machine.maintenanceItems);
-    updatedItems[itemIndex] = updatedItems[itemIndex].copyWith(
-      lastMaintenanceAtHour: currentHour,
-      clearLatestPreCheck: true,
-    );
-
-    _machines[machineIndex] = machine.copyWith(maintenanceItems: updatedItems);
+    final item = machine.maintenanceItems[itemIndex];
+    final updatedItems = item.resetInterval(currentHour: currentHour);
+    _machines[machineIndex] = machine.replaceMaintenanceItem(updatedItems);
   }
 
   MaintenanceItem _applyPreCheck(
