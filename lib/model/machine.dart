@@ -12,7 +12,6 @@ class Machine {
     required this.maintenanceItems,
     this.lastPreCheck,
   });
-
   final String id; // UUIDなど
   final String name; // 機械の名前
   final String modelName; // 機械のモデル名
@@ -52,6 +51,17 @@ class Machine {
       totalHours: totalHours ?? this.totalHours,
       maintenanceItems: maintenanceItems ?? this.maintenanceItems,
       lastPreCheck: lastPreCheck ?? this.lastPreCheck,
+    );
+  }
+
+  factory Machine.fromJson(Map<String, dynamic> json) {
+    return Machine(
+      id: json['id'].toString(),
+      name: json['name'] ?? '',
+      modelName: json['modelName'] ?? '',
+      totalHours: json['totalHours'] ?? 0,
+      maintenanceItems: [], //とりあえず空で
+      lastPreCheck: null,
     );
   }
 }
