@@ -228,6 +228,199 @@ class MaintenanceItem {
     );
   }
 }
+
+//============================================
+//fromJsonの追加
+//==============================================
+
+///MaintenanceItemのfromJson変換
+extension MaintenanceItemJson on MaintenanceItem {
+  //============================================
+  //メイン関数:JSON → MaintenanceItem
+  // ===========================================
+
+  /// JSON (Map) から　MaintenanceItem を生成する
+  ///
+  /// 必須フィールド：id, type, name, mode
+  /// オプション: recommendedIntervalHours, lastMaintenanceAtHour,
+  /// ///        lastInspectionDate, note, latestPreCheckStatus
+  static MaintenanceItem fromJson(Map<String, dynamic> json) {
+    // ===step1:必須フィールドの取り出し===
+    final rawId = json['id'];
+    final rawType = json['type'];
+    final rawName = json['name'];
+    final rawMode = json['mode'];
+
+    // === Step2: null チェック（必須フィールド）===
+    if (rawId == null) {
+      throw const FormatException(
+        'MaintenanceItem.fromJson:"id" is required but was null',
+      );
+    }
+
+    if (rawType == null) {
+      throw const FormatException(
+        'MaintenanceItem.fromJson:"type" is required but was null',
+      );
+    }
+
+    if (rawName == null) {
+      throw const FormatException(
+        'MaintenanceItem.fromJson:"name" is required but was null',
+      );
+    }
+
+    if (rawMode == null) {
+      throw const FormatException(
+        'MaintenanceITem.fromJson:"mode" is required but was null',
+      );
+    }
+
+    // === Step3 : 型変換(キャスト　＋　ヘルパー関数) ===
+    final id = rawId as String;
+    final name = rawName as String;
+
+    final type = _parseComponentType(rawType as String?);
+    final mode = _parseComponentMode(rawMode as String?);
+
+    //=== Step4: オプションフィールドの取り出し・変換 ===
+    final note = json['note'] as String?;
+
+    // int フィールド(null OK)
+    final recommendedIntervalHours = json['recommended_interval_hours'] as int?;
+    final lastMaintenanceAtHour = json['last_maintenance_at_hour'] as int?;
+
+    //DateTime フィールド（IS08601 文字列 → DateTime変換）
+    final lastInspectionDate = _parseDateTime(json['last_inspection_date']);
+
+    //CheckStatus フィールド（null　許容）
+    final latestPreCheckStatus =
+        json['latest_precheck_status'] != null
+            ? _pareCheckStatus(json['latest_precheck_status'] as String?)
+            : null;
+
+    //　=== Step5: MaintenanceItem を組み立てて返す ===
+    return MaintenanceItem(
+      id: id,
+      type: type,
+      name: name,
+      mode: mode,
+      recommendedIntervalHours: recommendedIntervalHours,
+      lastMaintenanceAtHour: lastMaintenanceAtHour,
+      lastInspectionDate: lastInspectionDate,
+      note: note,
+      latestPreCheckStatus: latestPreCheckStatus,
+    );
+  }
+
+  //================================
+  //変換マップ：文字列　→ Enum
+  //================================
+  static const Map<String, ComponentType> _typeMap = {
+    'engineOil': ComponentType.engineOil,
+    'coolant': ComponentType.coolant,
+    'grease': ComponentType.grease,
+    'airFilter': ComponentType.airFilter,
+    'hydraulicOil': ComponentType.hydraulicOil,
+    'fuelFilter': ComponentType.fuelFilter,
+    'transmissionOil': ComponentType.transmissionOil,
+    'tirePressure': ComponentType.tirePressure,
+    'brakeWire': ComponentType.brakeWire,
+  };
+
+  ///ComponentModeのfromJson変換
+  static const Map<String, ComponentMode> _modeMap = {
+    'intervalBased': ComponentMode.intervalBased,
+    'inspectionOnly': ComponentMode.inspectionOnly,
+  };
+
+  /// CheckStatusのfromJson変換
+  static const Map<String, CheckStatus> _statusMap = {
+    'notChecked': CheckStatus.notChecked,
+    'good': CheckStatus.good,
+    'critical': CheckStatus.critical,
+    'warning': CheckStatus.warning,
+  };
+  //===========================================
+  //ヘルパー関数: 文字列　→ 型変換
+  //===========================================
+
+  ///Json文字列からComponentTypeに変換
+  static ComponentType _parseComponentType(String? str) {
+    //nullチェック
+    if (str == null) {
+      throw FormatException('ComponentType is required but was null');
+    }
+
+    //Mapで検索
+    final result = _typeMap[str];
+
+    //見つからなかった時のエラー
+    if (result == null) {
+      throw FormatException('Invalid ComponentType: $str');
+    }
+
+    // 返す
+    return result;
+  }
+
+  ///JSON文字列　→ ComponentMode(必須フィールド用)
+  static ComponentMode _parseComponentMode(String? str) {
+    if (str == null) {
+      throw const FormatException('ComponentMode is required but was null');
+    }
+    //mapで検索
+    final result = _modeMap[str];
+
+    if (result == null) {
+      throw FormatException('Invalid ComponentMode:$str');
+    }
+
+    //返す
+    return result;
+  }
+
+  ///JSON文字列　→ CheckStatus(オプションフィールド用)
+  ///
+  ///⚠️ 重要：null　は[未点検]を表す正当な値なので、エラーにしない
+  static CheckStatus _pareCheckStatus(String? str) {
+    //null　チェック：呼び出し元で null チェック済みのため、ここに来る時点で非 null
+    if (str == null) {
+      throw const FormatException(
+        'CheckStatus must not be null when calling _pareCheckStatus',
+      );
+    }
+
+    //String 以外が来たらエラー
+    final result = _statusMap[str];
+    if (result == null) {
+      throw FormatException('Invalid CheckStatus:$str');
+    }
+    return result;
+  }
+
+  ///Json文字列　→ DateTime(オプションフィールド用)
+  ///IS08601形式（例："2024-12-06T10:30:00Z")をパース
+  static DateTime? _parseDateTime(dynamic str) {
+    if (str == null) {
+      return null;
+    }
+
+    if (str is! String) {
+      throw FormatException(
+        'DateTime must be String or null, but got:${str.runtimeType}',
+      );
+    }
+
+    try {
+      return DateTime.parse(str);
+    } catch (e) {
+      throw FormatException('Invalid DateTime format:$str(expected IS08601)');
+    }
+  }
+}
+
+//
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Phase 2: 交換機能の拡張
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

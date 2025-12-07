@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 import models
@@ -9,6 +10,17 @@ models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="FarmFlow API")
 
+#=========================================
+# CORS設定(Webブラウザからのアクセス許可)
+#=========================================
+app.add_middleware(
+    CORSMiddleware,
+
+    allow_origins=["*"], #全てのオリジンを許可(開発用)
+    allow_credentials = True,
+    allow_methods=["*"], #全てのHTTPメソッドを許可
+    allow_headers=["*"], #全てのHTTPヘッダーを許可
+)
 @app.get("/")
 def root():
     return {"message": "FarmFlow API is running"}
