@@ -13,13 +13,13 @@ class MachineApi {
     final url = Uri.parse('$baseUrl/machines');
 
     try {
-      final responese = await http.get(url);
+      final response = await http.get(url);
 
-      if (responese.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(responese.body);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
         return data.map((json) => Machine.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to fetch machines:${responese.statusCode}');
+        throw Exception('Failed to fetch machines:${response.statusCode}');
       }
     } catch (e) {
       throw Exception('API Error:$e');

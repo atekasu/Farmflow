@@ -55,12 +55,75 @@ class Machine {
   }
 
   factory Machine.fromJson(Map<String, dynamic> json) {
+    // バックエンドの JSON キーから値を取得
+    final rawId = json['id'];
+    final rawName = json['name'];
+    final rawModelName = json['model_name']; // snake_case
+    final rawTotalHours = json['total_hours']; // snake_case
+
+    // 必須項目の null チェック
+    if (rawId == null) {
+      throw FormatException('Machine.fromJson: "id" is required but was null');
+    }
+    if (rawName == null) {
+      throw FormatException(
+        'Machine.fromJson: "name" is required but was null',
+      );
+    }
+    if (rawModelName == null) {
+      throw FormatException(
+        'Machine.fromJson: "model_name" is required but was null',
+      );
+    }
+    if (rawTotalHours == null) {
+      throw FormatException(
+        'Machine.fromJson: "total_hours" is required but was null',
+      );
+    }
+
+    // 型チェックと変換
+    final String id;
+    if (rawId is String) {
+      id = rawId;
+    } else {
+      throw FormatException(
+        'Machine.fromJson: "id" must be String, but got ${rawId.runtimeType}: $rawId',
+      );
+    }
+
+    final String name;
+    if (rawName is String) {
+      name = rawName;
+    } else {
+      throw FormatException(
+        'Machine.fromJson: "name" must be String, but got ${rawName.runtimeType}: $rawName',
+      );
+    }
+
+    final String modelName;
+    if (rawModelName is String) {
+      modelName = rawModelName;
+    } else {
+      throw FormatException(
+        'Machine.fromJson: "model_name" must be String, but got ${rawModelName.runtimeType}: $rawModelName',
+      );
+    }
+
+    final int totalHours;
+    if (rawTotalHours is int) {
+      totalHours = rawTotalHours;
+    } else {
+      throw FormatException(
+        'Machine.fromJson: "total_hours" must be int, but got ${rawTotalHours.runtimeType}: $rawTotalHours',
+      );
+    }
+
     return Machine(
-      id: json['id'].toString(),
-      name: json['name'] ?? '',
-      modelName: json['modelName'] ?? '',
-      totalHours: json['totalHours'] ?? 0,
-      maintenanceItems: [], //とりあえず空で
+      id: id,
+      name: name,
+      modelName: modelName,
+      totalHours: totalHours,
+      maintenanceItems: [], // とりあえず空で
       lastPreCheck: null,
     );
   }
