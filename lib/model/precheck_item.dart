@@ -27,13 +27,13 @@ class PreCheckItem {
 }
 
 enum PreCheckCategory {
-  tractor, //トラクター
-  rotary, //ロータリー
+  tractor,
+  rotary,
 }
 
 enum CheckStatus {
-  notChecked, //未選択
-  good, //問題なし
-  warning, //注意
-  critical, //破損、交換
+  notChecked,
+  good,
+  warning,
+  critical,
 }

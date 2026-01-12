@@ -12,22 +12,51 @@ class Machine {
     required this.maintenanceItems,
     this.lastPreCheck,
   });
-  final String id; // UUIDなど
-  final String name; // 機械の名前
-  final String modelName; // 機械のモデル名
-  final int totalHours; // アワーメーターの値
-  final List<MaintenanceItem> maintenanceItems; // メンテナンス項目のリスト
-  final PreCheckRecord? lastPreCheck; // 最新の使用前点検記録
 
-  // Factory constructors moved to domain/MachineFactory for separation of concerns.
+  final String id;
+  final String name;
+  final String modelName;
+  final int totalHours;
+  final List<MaintenanceItem> maintenanceItems;
+  final PreCheckRecord? lastPreCheck;
 
-  /// 個々のメンテ項目の状態から全体の状態を集約する
+  factory Machine.fromJson(Map<String, dynamic> json) {
+    // Support both backend snake_case and older camelCase payloads.
+    final id = (json['id'] ?? json['machineId']) as String;
+    final name = (json['name'] ?? json['machineName']) as String;
+
+    final modelName = (json['model_name'] ?? json['modelName']) as String;
+    final totalHours = (json['total_hours'] ?? json['totalHours']) as int;
+
+    final itemsRaw = (json['maintenance_items'] ??
+            json['maintenanceItems'] ??
+            json['maintennace_item'])
+        as List<dynamic>?;
+
+    final maintenanceItems = (itemsRaw ?? const <dynamic>[])
+        .map((e) => MaintenanceItem.fromJson(e as Map<String, dynamic>))
+        .toList();
+
+    final lastPreCheckRaw =
+        (json['last_precheck'] ?? json['lastPreCheck']) as Map<String, dynamic>?;
+
+    return Machine(
+      id: id,
+      name: name,
+      modelName: modelName,
+      totalHours: totalHours,
+      maintenanceItems: maintenanceItems,
+      lastPreCheck:
+          lastPreCheckRaw != null ? PreCheckRecord.fromJson(lastPreCheckRaw) : null,
+    );
+  }
+
   EquipmentStatus overallStatus(MaintenanceRules rules) {
     var worst = EquipmentStatus.good;
     for (final c in maintenanceItems) {
       final s = c.evaluateStatus(totalHours, rules);
       if (s == EquipmentStatus.critical) {
-        return EquipmentStatus.critical; // 1つでもcriticalなら即critical
+        return EquipmentStatus.critical;
       }
       if (s == EquipmentStatus.warning) {
         worst = EquipmentStatus.warning;
@@ -54,107 +83,13 @@ class Machine {
     );
   }
 
-  factory Machine.fromJson(Map<String, dynamic> json) {
-    // バックエンドの JSON キーから値を取得
-    final rawId = json['id'];
-    final rawName = json['name'];
-    final rawModelName = json['model_name']; // snake_case
-    final rawTotalHours = json['total_hours']; // snake_case
-
-    // 必須項目の null チェック
-    if (rawId == null) {
-      throw FormatException('Machine.fromJson: "id" is required but was null');
-    }
-    if (rawName == null) {
-      throw FormatException(
-        'Machine.fromJson: "name" is required but was null',
-      );
-    }
-    if (rawModelName == null) {
-      throw FormatException(
-        'Machine.fromJson: "model_name" is required but was null',
-      );
-    }
-    if (rawTotalHours == null) {
-      throw FormatException(
-        'Machine.fromJson: "total_hours" is required but was null',
-      );
-    }
-
-    // 型チェックと変換
-    final String id;
-    if (rawId is String) {
-      id = rawId;
-    } else {
-      throw FormatException(
-        'Machine.fromJson: "id" must be String, but got ${rawId.runtimeType}: $rawId',
-      );
-    }
-
-    final String name;
-    if (rawName is String) {
-      name = rawName;
-    } else {
-      throw FormatException(
-        'Machine.fromJson: "name" must be String, but got ${rawName.runtimeType}: $rawName',
-      );
-    }
-
-    final String modelName;
-    if (rawModelName is String) {
-      modelName = rawModelName;
-    } else {
-      throw FormatException(
-        'Machine.fromJson: "model_name" must be String, but got ${rawModelName.runtimeType}: $rawModelName',
-      );
-    }
-
-    final int totalHours;
-    if (rawTotalHours is int) {
-      totalHours = rawTotalHours;
-    } else {
-      throw FormatException(
-        'Machine.fromJson: "total_hours" must be int, but got ${rawTotalHours.runtimeType}: $rawTotalHours',
-      );
-    }
-
-    return Machine(
-      id: id,
-      name: name,
-      modelName: modelName,
-      totalHours: totalHours,
-      maintenanceItems: [], // とりあえず空で
-      lastPreCheck: null,
-    );
+  /// Replace (by id) a single maintenance item and return a new Machine instance.
+  Machine replaceMaintenanceItem(MaintenanceItem updatedItem) {
+    final next = maintenanceItems
+        .map((it) => it.id == updatedItem.id ? updatedItem : it)
+        .toList();
+    return copyWith(maintenanceItems: next);
   }
 }
 
-///=============================================
-///メンテナンス項目の置換機能
-///=============================================
-///
-///Machineの拡張メソッド
-extension MachineOps on Machine {
-  ///maintenanceItemsの中から、指定されたitem を置換する
-  ///
-  ///[updated]: 更新後のMaintenanceItem
-  ///
-  ///動作:
-  ///-idが一致する項目を探す
-  ///-見つかったら置換
-  ///-見つからなかったらmachineをそのまま返す(イミュータブル)
-  ///
-  Machine replaceMaintenanceItem(MaintenanceItem updated) {
-    final index = maintenanceItems.indexWhere((item) => item.id == updated.id);
-
-    // 見つからない場合は何もしない
-    if (index < 0) return this;
-
-    //新しいリストを作成(イミュータブル)
-    final newItems = List<MaintenanceItem>.from(maintenanceItems);
-    newItems[index] = updated;
-
-    //新しいMachneを返す
-    return copyWith(maintenanceItems: newItems);
-  }
-}
+extension MachineOps on Machine {}

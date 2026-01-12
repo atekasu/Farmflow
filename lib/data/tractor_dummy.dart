@@ -2,7 +2,6 @@ import 'package:farmflow/domain/machine_factory.dart';
 import 'package:farmflow/model/machine/equipment_status.dart';
 import 'package:farmflow/model/precheck_item.dart';
 
-/// Phase 2 Design: 多様なテストケースを明示的に定義
 DateTime _daysAgo(int days) => DateTime.now().subtract(Duration(days: days));
 
 Map<ComponentType, DateTime> _inspectionDates({
@@ -64,13 +63,8 @@ final dummyMachines = [
     ),
   ),
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Pattern 2: ⚠️ 交換間近（warning）
   //
-  // 設計意図:
-  // - エンジンオイル: 1200 - 150 = 1050h に交換済み
   //   → used = 150h / interval = 200h → remaining = 50h (25%)
-  // - 目標: threshold=0.3（30%）を下回る → warning
-  // - 目標: threshold=0.2（20%）は上回る → critical にはならない
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   MachineFactory.createTractor(
     id: 'TRACTOR-002',
@@ -85,7 +79,7 @@ final dummyMachines = [
       ComponentType.transmissionOil: 1000, // used=200h (67% remaining) → good
     },
     lastInspectionDates: _inspectionDates(
-      coolant: 33, // warning 領域に入る日数
+      coolant: 33,
       grease: 12,
       airFilter: 29,
       tirePressure: 18,
@@ -94,12 +88,8 @@ final dummyMachines = [
   ),
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Pattern 3: 🚨 交換時期（critical）
   //
-  // 設計意図:
-  // - エンジンオイル: 1880 - 180 = 1700h に交換済み
   //   → used = 180h / interval = 180h → remaining = 0h
-  // - 目標: threshold=0.2（20%）を下回る → critical
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   MachineFactory.createTractor(
     id: 'TRACTOR-003',
@@ -114,7 +104,7 @@ final dummyMachines = [
       ComponentType.transmissionOil: 1680, // used=200h (67% remaining) → good
     },
     lastInspectionDates: _inspectionDates(
-      coolant: 62, // critical を再現
+      coolant: 62,
       grease: 17,
       airFilter: 35,
       tirePressure: 27,
@@ -123,15 +113,8 @@ final dummyMachines = [
   ),
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Pattern 4: ⚠️ PreCheck 異常（時間は good）
   //
-  // 設計意図:
-  // - エンジンオイル: 時間的には余裕（約80% remaining）
-  // - しかし PreCheck で warning 検出
-  // - 結果: max(good, warning) = warning
   //
-  // 学習ポイント:
-  // - evaluateStatus は「時間」と「PreCheck」の厳しい方を採用
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   MachineFactory.createTractor(
     id: 'TRACTOR-004',
@@ -140,13 +123,13 @@ final dummyMachines = [
     totalHours: 800,
     recommendedIntervals: _extendedIntervals,
     lastMaintenanceHours: {
-      ComponentType.engineOil: 750, // used=50h (約80% remaining) → good
+      ComponentType.engineOil: 750,
       ComponentType.hydraulicOil: 680, // used=120h (70% remaining) → good
       ComponentType.fuelFilter: 680, // used=120h (70% remaining) → good
       ComponentType.transmissionOil: 600, // used=200h (67% remaining) → good
     },
     preCheckStatuses: {
-      ComponentType.engineOil: CheckStatus.warning, // ← PreCheck で異常検出
+      ComponentType.engineOil: CheckStatus.warning,
     },
     lastInspectionDates: _inspectionDates(
       coolant: 14,
@@ -158,17 +141,8 @@ final dummyMachines = [
   ),
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Pattern 5: 🚨 複合異常（時間 warning + PreCheck critical）
   //
-  // 設計意図:
-  // - エンジンオイル: 時間的に warning（27.5% remaining）
-  // - PreCheck でも critical 検出
-  // - 結果: max(warning, critical) = critical
-  // - 油圧オイルも critical（17.5% remaining）
   //
-  // 学習ポイント:
-  // - 複数項目が同時に異常になるケース
-  // - overallStatus は最悪値を採用
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   MachineFactory.createTractor(
     id: 'TRACTOR-005',
@@ -184,7 +158,7 @@ final dummyMachines = [
       ComponentType.transmissionOil: 1900, // used=200h (67% remaining) → good
     },
     preCheckStatuses: {
-      ComponentType.engineOil: CheckStatus.critical, // ← 時間+PreCheck 両方異常
+      ComponentType.engineOil: CheckStatus.critical,
     },
     lastInspectionDates: _inspectionDates(
       coolant: 44,
@@ -196,16 +170,8 @@ final dummyMachines = [
   ),
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Pattern 6: 🆕 新品同様（ほぼ未使用）
   //
-  // 設計意図:
-  // - すべての項目が未交換（lastMaintenanceAtHour = 0）
-  // - used = 50h / interval = 240h → remaining = 190h (約79%)
-  // - すべて good 状態
   //
-  // 学習ポイント:
-  // - 新車の状態を表現
-  // - Factory のデフォルト値（0）をそのまま使用
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   MachineFactory.createTractor(
     id: 'TRACTOR-006',
@@ -213,7 +179,6 @@ final dummyMachines = [
     modelName: 'SL550',
     totalHours: 50,
     recommendedIntervals: _extendedIntervals,
-    // lastMaintenanceHours を指定しない → すべて 0（未交換）
     lastInspectionDates: _inspectionDates(
       coolant: 3,
       grease: 2,

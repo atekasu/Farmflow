@@ -2,7 +2,6 @@ import 'package:farmflow/model/precheck_item.dart';
 
 class PreCheckItemsData {
   static const List<PreCheckItem> items = [
-    //トラクター本体
     PreCheckItem(
       id: 'engin_oil_check',
       name: 'エンジンオイル',
@@ -34,7 +33,6 @@ class PreCheckItemsData {
       category: PreCheckCategory.tractor,
     ),
 
-    //ロータリー
     PreCheckItem(
       id: 'chain_cover',
       name: 'チェーンカバー',

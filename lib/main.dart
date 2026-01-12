@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-///起動直後に一度だけ resetIfNewDate() を実行する薄いブートスラップ
 class _Bootstrap extends ConsumerStatefulWidget {
   const _Bootstrap({Key? key, required this.child}) : super(key: key);
   final Widget child;
@@ -37,9 +36,7 @@ class _BootstrapState extends ConsumerState<_Bootstrap> with WidgetsBindingObser
   @override
   void initState() {
     super.initState();
-    // ライフサイクル監視を登録
     WidgetsBinding.instance.addObserver(this);
-    // 初回フレーム後に一度だけチェック（描画をブロックしない）
     WidgetsBinding.instance.addPostFrameCallback((_) => _resetIfNeeded());
   }
 
@@ -67,7 +64,6 @@ class _BootstrapState extends ConsumerState<_Bootstrap> with WidgetsBindingObser
 
   @override
   Widget build(BuildContext context) {
-    // ここでローディングを挟みたければ挟める
     return widget.child;
   }
 }

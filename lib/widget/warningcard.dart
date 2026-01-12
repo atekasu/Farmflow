@@ -68,9 +68,9 @@ _WarningStyle _styleFor(BuildContext context, EquipmentStatus status) {
       );
     case EquipmentStatus.warning:
       return _WarningStyle(
-        Colors.amber[100]!, //背景色
-        Colors.amber[800]!, //アイコン色
-        Colors.black, //テキスト色
+        Colors.amber[100]!,
+        Colors.amber[800]!,
+        Colors.black,
       );
     default:
       return _WarningStyle(

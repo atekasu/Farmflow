@@ -59,7 +59,6 @@ class TractorCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 上部: 機械名、モデル名、ステータス
               Row(
                 children: [
                   Expanded(
@@ -86,7 +85,6 @@ class TractorCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // ステータスインジケーター
                   Row(
                     children: [
                       Container(
@@ -111,7 +109,6 @@ class TractorCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              // 下部: 走行時間
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
