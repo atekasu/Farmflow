@@ -1,6 +1,6 @@
 
 # FarmFlow
-農業現場の「神の始業点検」をスマホで置き換える、トラクター点検・メンテナンス管理アプリです。
+農業現場の「紙の始業点検」をスマホで置き換える、トラクター点検・メンテナンス管理アプリです。
 ![Status](https://img.shields.io/badge/status-in%20development-yellow)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
 ![FastApi](https://img.shields.io/badge/FastApi-0.95.x-green)
