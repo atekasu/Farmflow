@@ -1,10 +1,8 @@
-
 # FarmFlow
 農業現場の「紙の始業点検」をスマホで置き換える、トラクター点検・メンテナンス管理アプリです。
 ![Status](https://img.shields.io/badge/status-in%20development-yellow)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
-![FastApi](https://img.shields.io/badge/FastApi-0.95.x-green)
-
+![FastApi](https://img.shields.io/badge/FastApi-0.109.x-green)
 ## 📕Overview
 FarmFlow は、作業者が**トラクターを使い始めるタイミング**にチェックリスト点検を行い、状態と履歴を残して、**故障の見落とし・情報共有もれ**を減らすことを目指すモバイルアプリです。
 - 想定ユーザー：作業者
@@ -33,9 +31,51 @@ FarmFlow は、作業者が**トラクターを使い始めるタイミング**�
 ※インターバル時間は Kubota の始業前点検・説明書の推奨値を参照して設定
 
 ## Tech Stack
--Frontend: Dart / Flutter / Riverpod
--Backend: Python / FastAPI
--DB: SQLite
+- Frontend: Dart / Flutter / Riverpod
+- Backend: Python / FastAPI
+- DB: SQLite
+
+## 🚀 セットアップ手順
+
+### 前提条件
+- Flutter 3.x
+- Python 3.10+
+- Git
+
+### フロントエンド (Flutter)
+```bash
+# リポジトリをクローン
+git clone https://github.com/atekasu/Farmflow.git
+cd Farmflow
+
+# 依存パッケージをインストール
+flutter pub get
+```
+
+**実行方法（いずれか）：**
+- VSCode: エミュレータを起動 → F5 でデバッグ実行
+- ターミナル: `flutter run`
+
+### バックエンド (FastAPI)
+```bash
+cd backend
+
+# 仮想環境を作成・有効化
+python -m venv venv
+source venv/bin/activate  # Windowsの場合: venv\Scripts\activate
+
+# 依存パッケージをインストール
+pip install -r requirements.txt
+
+# 初期データを投入
+python seed.py
+
+# サーバーを起動
+uvicorn main:app --reload
+
+# 動作確認
+curl -s http://127.0.0.1:8000/machines
+```
 
 ## Demo / Usage（デモ手順）
 1. 機械一覧を開く
@@ -50,9 +90,8 @@ FarmFlow は、作業者が**トラクターを使い始めるタイミング**�
 ![機械一覧](docs/screenshots/home.png)
 
 ### 機械詳細（ステータス / 注意事項 / ゲージ）
-![機械詳細](docs/screenshots/machine_detail.png)
+![機械詳細](docs/screenshots/detailscreen.png)
 ![注意事項](docs/screenshots/warnings.png)
-
 ### 交換記録
 ![交換確認](docs/screenshots/exchange_confirm.png)
 ![保存完了](docs/screenshots/saved_snackbar.png)
@@ -80,18 +119,9 @@ FarmFlow は、作業者が**トラクターを使い始めるタイミング**�
 - `screen/` … 画面（Home / Detail / PreCheck）
 - `widget/` … UI部品（カード・リストなど）
 
-### Backend (FastAPI)
+### Backend (FastAPI) - `backend/`
 - `main.py` … エントリポイント
 - `models.py` / `schemas.py` … DBモデル / APIスキーマ
 - `database.py` … DB接続
 - `seed.py` … 初期データ投入
 - `farmflow.db` … SQLite DB（開発用）
-
-
-### バックエンド (FastAPI)
-```bash
-cd backend
-source venv/bin/activate
-uvicorn main:app --reload
-##動作環境
-curl -s http://127.0.0.1:8000/machines
