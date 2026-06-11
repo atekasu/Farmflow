@@ -2,9 +2,9 @@
 農業現場の「紙の始業点検」をスマホで置き換える、トラクター点検・メンテナンス管理アプリです。
 ![Status](https://img.shields.io/badge/status-in%20development-yellow)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
-![FastApi](https://img.shields.io/badge/FastApi-0.109.x-green)
+![FastAPI](https://img.shields.io/badge/FastApi-0.109.x-green)
 ## 📕Overview
-FarmFlow は、作業者が**トラクターを使い始めるタイミング**にチェックリスト点検を行い、状態と履歴を残して、**故障の見落とし・情報共有もれ**を減らすことを目指すモバイルアプリです。
+FarmFlow は、作業者が**トラクターを使い始める前に**にチェックリスト点検を行い、状態と履歴を残して、**故障の見落とし・情報共有もれ**を減らすことを目指すモバイルアプリです。
 - 想定ユーザー：作業者
 - 利用シーン：トラクターを使い始めのタイミング（始業前）
 
