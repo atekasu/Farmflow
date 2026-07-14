@@ -149,7 +149,6 @@ class MaintenanceItem {
     return _maxStatus(timeBasedStatus, preCheckStatus);
   }
 
-
   ///
   /// - intervalBased:
   /// - inspectionOnly:
@@ -221,7 +220,6 @@ class MaintenanceItem {
     final bb = _severity[b] ?? 0;
     return (aa >= bb) ? a : b;
   }
-
 
   int _daysSince(DateTime from, DateTime to) => to.difference(from).inDays;
 
