@@ -10,7 +10,7 @@ final machineRepositoryProvider = Provider<MachineRepository>((ref) {
 
   if (_useApi) {
     print('🔧repository_provide:AIP経由でデータ取得');
-    final api = MachineApi(baseUrl: 'http://127.0.0.1:8000');
+    final api = MachineApi();
     return MachineRepositoryImpl(api: api, initial: dummyMachines);
   } else {
     print('🔧repository_provide:ダミーデータのみ使用');

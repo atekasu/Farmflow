@@ -1,0 +1,60 @@
+meta {
+  name: Get Machines
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/machines
+  body: none
+  auth: inherit
+}
+
+example {
+  name: 200 Response
+  description: Successful Response
+  
+  request: {
+    url: {{baseUrl}}/machines
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        [
+          {
+            "id": "",
+            "name": "",
+            "model_name": "",
+            "total_hours": 0,
+            "maintenance_items": [
+              {
+                "id": "",
+                "machine_id": "",
+                "type": "",
+                "name": "",
+                "mode": "",
+                "recommended_interval_hours": "",
+                "last_maintenance_at_hour": "",
+                "last_inspection_date": "",
+                "latest_precheck_status": ""
+              }
+            ]
+          }
+        ]
+      '''
+    }
+  }
+}

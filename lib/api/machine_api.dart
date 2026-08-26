@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:farmflow/model/machine.dart';
 
 class MachineApi {
-  MachineApi({this.baseUrl = 'http://127.0.0.1:8000'});
+  MachineApi({this.baseUrl = 'http://192.168.0.190:8000'});
 
   final String baseUrl;
 

@@ -1,5 +1,6 @@
 # backend/main.py
 import uuid
+from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import List
 
@@ -14,7 +15,25 @@ from sqlalchemy.orm import Session, selectinload
 
 models.Base.metadata.create_all(bind=database.engine)
 
-app = FastAPI(title="FarmFlow API")
+
+# 起動時処理を「@app.on_event("startup")」から lifespan 方式へ変更。
+# on_event は FastAPI で非推奨になり、DeprecationWarning が出るため。
+#
+# 読み方: yield の「前」が起動時に一度だけ走る処理（＝旧 on_startup の中身）、
+# 「後」が終了時の後片付け。今は終了時にやることが無いので yield の後は空。
+# 起動と終了の処理が一箇所にまとまるので、開いたものを閉じ忘れにくいのが利点。
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    db = database.SessionLocal()
+    try:
+        seed.ensure_seed_data(db)
+    finally:
+        db.close()
+    yield
+
+
+# lifespan=lifespan を渡すことで、上の関数が起動・終了時に呼ばれる。
+app = FastAPI(title="FarmFlow API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,15 +42,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-def on_startup():
-    db = database.SessionLocal()
-    try:
-        seed.ensure_seed_data(db)
-    finally:
-        db.close()
 
 
 @app.get("/")

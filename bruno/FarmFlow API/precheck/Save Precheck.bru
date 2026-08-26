@@ -1,0 +1,102 @@
+meta {
+  name: Save Precheck
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/precheck
+  body: json
+  auth: inherit
+}
+
+params:query {
+  machine_id: 
+  total_hours: 
+}
+
+body:json {
+  {}
+}
+
+example {
+  name: 200 Response
+  description: Successful Response
+  
+  request: {
+    url: {{baseUrl}}/precheck
+    method: POST
+    mode: json
+    params:query: {
+      machine_id: 
+      total_hours: 
+    }
+  
+    body:json: {
+      {}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 422 Response
+  description: Validation Error
+  
+  request: {
+    url: {{baseUrl}}/precheck
+    method: POST
+    mode: json
+    params:query: {
+      machine_id: 
+      total_hours: 
+    }
+  
+    body:json: {
+      {}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 422
+      text: Unprocessable Entity
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": [
+            {
+              "loc": [],
+              "msg": "",
+              "type": ""
+            }
+          ]
+        }
+      '''
+    }
+  }
+}

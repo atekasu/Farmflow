@@ -1,0 +1,105 @@
+meta {
+  name: Get Machine
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/machines/:machine_id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  machine_id: 
+}
+
+example {
+  name: 200 Response
+  description: Successful Response
+  
+  request: {
+    url: {{baseUrl}}/machines/:machine_id
+    method: GET
+    mode: none
+    params:path: {
+      machine_id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "name": "",
+          "model_name": "",
+          "total_hours": 0,
+          "maintenance_items": [
+            {
+              "id": "",
+              "machine_id": "",
+              "type": "",
+              "name": "",
+              "mode": "",
+              "recommended_interval_hours": "",
+              "last_maintenance_at_hour": "",
+              "last_inspection_date": "",
+              "latest_precheck_status": ""
+            }
+          ]
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 422 Response
+  description: Validation Error
+  
+  request: {
+    url: {{baseUrl}}/machines/:machine_id
+    method: GET
+    mode: none
+    params:path: {
+      machine_id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 422
+      text: Unprocessable Entity
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": [
+            {
+              "loc": [],
+              "msg": "",
+              "type": ""
+            }
+          ]
+        }
+      '''
+    }
+  }
+}
